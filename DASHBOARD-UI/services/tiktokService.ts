@@ -98,8 +98,9 @@ export const getTikTokAuthUrl = async () => {
     const CLIENT_KEY = getTikTokClientKey();
     const REDIRECT_URI = getTikTokRedirectUri();
 
-    // FULL SCOPES for the demo video
-    const SCOPE = 'user.info.basic,video.list,video.data';
+    // MINIMAL SCOPE for Sandbox compatibility
+    // Only user.info.basic is guaranteed to be approved in Sandbox
+    const SCOPE = 'user.info.basic';
     const STATE = 'tiktok_val_' + Math.random().toString(36).substring(7);
 
     // PKCE implementation

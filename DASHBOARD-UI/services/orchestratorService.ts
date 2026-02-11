@@ -37,7 +37,7 @@ export function detectIntent(query: string): AgentType[] {
     const agents: Set<AgentType> = new Set();
 
     // Guardian triggers
-    const guardianKeywords = ['violação', 'proibido', 'banimento', 'diretriz', 'compliance', 'regra', 'permitido', 'pode', 'política'];
+    const guardianKeywords = ['violação', 'proibido', 'banimento', 'diretriz', 'compliance', 'regra', 'permitido', 'pode', 'posso', 'política'];
     if (guardianKeywords.some(kw => queryLower.includes(kw))) {
         agents.add('guardian');
     }

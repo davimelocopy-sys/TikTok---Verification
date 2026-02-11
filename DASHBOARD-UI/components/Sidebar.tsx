@@ -9,11 +9,15 @@ const Sidebar: React.FC<{ user: any }> = ({ user }) => {
   const handleSignOut = async () => {
     // Clear Supabase session
     await supabase.auth.signOut();
+
     // Clear TikTok session data
     localStorage.removeItem('tiktok_access_token');
     localStorage.removeItem('tiktok_refresh_token');
     localStorage.removeItem('tiktok_oauth_state');
     localStorage.removeItem('tiktok_code_verifier');
+
+    // Redirect to login page
+    window.location.href = '/';
   };
 
   const isActive = (path: string) => location.pathname === path;
