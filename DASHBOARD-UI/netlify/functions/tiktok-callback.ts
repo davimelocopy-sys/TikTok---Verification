@@ -1,10 +1,15 @@
 import { Handler } from '@netlify/functions';
 
-const CLIENT_KEY = process.env.VITE_TIKTOK_CLIENT_KEY;
-const CLIENT_SECRET = process.env.VITE_TIKTOK_CLIENT_SECRET;
-const REDIRECT_URI = process.env.URL
-    ? 'https://diretrizestiktok.netlify.app/dashboard' // Force Production URL
-    : 'http://localhost:5173/dashboard'; // Local development
+// Robust fallbacks for environment variables
+const getEnv = (key: string, fallback: string) => {
+    const val = process.env[key];
+    if (!val || val === 'undefined' || val === 'null') return fallback;
+    return val;
+};
+
+const CLIENT_KEY = getEnv('VITE_TIKTOK_CLIENT_KEY', 'aw2hy5cc9vf27xpz');
+const CLIENT_SECRET = getEnv('VITE_TIKTOK_CLIENT_SECRET', '5eFF3i9AVVZi9bbOCVzFfprsgHIUtjcZ');
+const REDIRECT_URI = 'https://diretrizestiktok.netlify.app/dashboard';
 
 export const handler: Handler = async (event) => {
     if (event.httpMethod !== 'POST') {

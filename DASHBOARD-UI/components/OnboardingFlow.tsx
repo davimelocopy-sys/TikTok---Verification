@@ -16,25 +16,18 @@ const OnboardingFlow: React.FC = () => {
     }
   }, []);
 
-  const handleConnect = () => {
+  const handleConnect = async () => {
     setIsConnecting(true);
-
-    // Real TikTok OAuth Flow
-    const CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY || 'aw2hy5cc9vf27xpz';
-    // Redirect explicitly to dashboard where we handle the code
-    const REDIRECT_URI = window.location.hostname === 'localhost'
-      ? 'http://localhost:5173/dashboard'
-      : 'https://diretrizestiktok.netlify.app/dashboard';
-
-    const SCOPE = 'user.info.basic,video.list,video.data';
-    const STATE = 'tiktok_connect_' + Math.random().toString(36).substring(7);
-
-    // Save state to verify later
-    localStorage.setItem('tiktok_oauth_state', STATE);
-
-    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${CLIENT_KEY}&scope=${SCOPE}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE}`;
-
-    window.location.href = authUrl;
+    try {
+      const { getTikTokAuthUrl } = await import('../services/tiktokService');
+      const authUrl = await getTikTokAuthUrl();
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Failed to initiate TikTok login:', error);
+      setIsConnecting(true); // Keep state to show "connecting" until redirect? Or set to false?
+      // Re-allowing click if failed
+      setTimeout(() => setIsConnecting(false), 2000);
+    }
   };
 
   const handleScan = () => {

@@ -7,7 +7,7 @@ import RecentAuditsTable from '../components/RecentAuditsTable';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { Upload, FileText, Play, Plus, ShieldCheck, ChevronRight, CheckCircle, Video } from 'lucide-react';
 import { Audit, FinancialMetric, Alert } from '../types';
-import { exchangeCodeForToken, getTikTokUserInfo, getTikTokVideos } from '../services/tiktokService';
+import { exchangeCodeForToken, getTikTokUserInfo, getTikTokVideos, getTikTokAuthUrl } from '../services/tiktokService';
 
 const Dashboard: React.FC = () => {
   const [scriptText, setScriptText] = useState('');
@@ -106,41 +106,16 @@ const Dashboard: React.FC = () => {
     navigate('/audits/new');
   };
 
-  // PKCE Helper Functions
-  const generateCodeVerifier = () => {
-    const array = new Uint8Array(32);
-    window.crypto.getRandomValues(array);
-    return Array.from(array, dec => ('0' + dec.toString(16)).substr(-2)).join('');
-  };
-
-  const generateCodeChallenge = async (verifier: string) => {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(verifier);
-    const digest = await window.crypto.subtle.digest('SHA-256', data);
-    return btoa(String.fromCharCode(...new Uint8Array(digest)))
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
-  };
 
   const handleConnectTikTok = async () => {
-    const CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY || 'aw2hy5cc9vf27xpz';
-    const REDIRECT_URI = window.location.hostname === 'localhost'
-      ? 'http://localhost:5173/dashboard'
-      : `${window.location.origin}/dashboard`;
-    const SCOPE = 'user.info.basic,video.list,video.data';
-    const STATE = 'tiktok_connect_dash_' + Math.random().toString(36).substring(7);
-
-    // PKCE Generation
-    const codeVerifier = generateCodeVerifier();
-    const codeChallenge = await generateCodeChallenge(codeVerifier);
-
-    localStorage.setItem('tiktok_oauth_state', STATE);
-    localStorage.setItem('tiktok_code_verifier', codeVerifier);
-
-    const authUrl = `https://www.tiktok.com/v2/auth/authorize/?client_key=${CLIENT_KEY}&scope=${SCOPE}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
-
-    window.location.href = authUrl;
+    setIsLoading(true);
+    try {
+      const authUrl = await getTikTokAuthUrl();
+      window.location.href = authUrl;
+    } catch (error) {
+      console.error('Failed to connect TikTok:', error);
+      setIsLoading(false);
+    }
   };
 
   return (

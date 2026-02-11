@@ -1,6 +1,22 @@
 
 const TIKTOK_API_BASE = 'https://open.tiktokapis.com/v2';
 
+// Robust Client Key with fallback for string "undefined"
+export const getTikTokClientKey = () => {
+    const rawKey = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
+    if (!rawKey || rawKey === 'undefined' || rawKey === 'null') {
+        return 'aw2hy5cc9vf27xpz'; // Verified fallback from CREDENCIAIS.md
+    }
+    return rawKey;
+};
+
+// Consistent Redirect URI
+export const getTikTokRedirectUri = () => {
+    return window.location.hostname === 'localhost'
+        ? 'http://localhost:5173/dashboard'
+        : 'https://diretrizestiktok.netlify.app/dashboard';
+};
+
 export const exchangeCodeForToken = async (code: string) => {
     try {
         const codeVerifier = localStorage.getItem('tiktok_code_verifier');
@@ -58,4 +74,42 @@ export const getTikTokVideos = async (accessToken: string) => {
         console.error('Error fetching videos:', error);
         return [];
     }
+};
+
+/**
+ * PKCE Helpers
+ */
+export const generateCodeVerifier = () => {
+    const array = new Uint8Array(32);
+    window.crypto.getRandomValues(array);
+    return Array.from(array, dec => ('0' + dec.toString(16)).substring(-2)).join('');
+};
+
+export const generateCodeChallenge = async (verifier: string) => {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(verifier);
+    const digest = await window.crypto.subtle.digest('SHA-256', data);
+    return btoa(String.fromCharCode(...new Uint8Array(digest)))
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_')
+        .replace(/=+$/, '');
+};
+
+/**
+ * Generates the full Auth URL with PKCE
+ */
+export const getTikTokAuthUrl = async () => {
+    const CLIENT_KEY = getTikTokClientKey();
+    const REDIRECT_URI = getTikTokRedirectUri();
+    const SCOPE = 'user.info.basic,video.list,video.data';
+    const STATE = 'tiktok_connect_' + Math.random().toString(36).substring(7);
+
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
+
+    // Persist for callback
+    localStorage.setItem('tiktok_oauth_state', STATE);
+    localStorage.setItem('tiktok_code_verifier', codeVerifier);
+
+    return `https://www.tiktok.com/v2/auth/authorize/?client_key=${CLIENT_KEY}&scope=${SCOPE}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
 };
