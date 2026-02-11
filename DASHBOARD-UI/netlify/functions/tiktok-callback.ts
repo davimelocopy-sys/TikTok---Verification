@@ -3,7 +3,7 @@ import { Handler } from '@netlify/functions';
 
 // FORCING SANDBOX CREDENTIALS FOR RELIABILITY
 const CLIENT_KEY = 'sbawsesnguzr1tmzg2';
-const CLIENT_SECRET = 'biGJ6iBgqlbsnEdWDqy6QtFLNhJHcKTj';
+const CLIENT_SECRET = 'biGJ6iBgqlbsnEdWDqy6QtFLNhJHcKTj'; // Validated from CREDENCIAIS.md
 const REDIRECT_URI = 'https://diretrizestiktok.netlify.app/dashboard';
 
 export const handler: Handler = async (event) => {
@@ -12,6 +12,10 @@ export const handler: Handler = async (event) => {
     }
 
     const { code, code_verifier } = JSON.parse(event.body || '{}');
+
+    console.log('=== NETLIFY FUNCTION DEBUG ===');
+    console.log('Received code:', code ? 'YES' : 'NO');
+    console.log('Received code_verifier:', code_verifier ? 'YES' : 'NO');
 
     if (!code) {
         return { statusCode: 400, body: 'Missing code' };
