@@ -72,10 +72,19 @@ const Dashboard: React.FC = () => {
     const code = searchParams.get('code') || urlParams.get('code');
     const savedToken = localStorage.getItem('tiktok_access_token');
 
+    console.log('=== TIKTOK CALLBACK DEBUG ===');
+    console.log('URL:', window.location.href);
+    console.log('Code from URL:', code);
+    console.log('Saved Token:', savedToken ? 'EXISTS' : 'NULL');
+
     const loadData = async (token: string) => {
+      console.log('Loading TikTok data with token:', token.substring(0, 20) + '...');
       setIsLoading(true);
       const user = await getTikTokUserInfo(token);
       const videos = await getTikTokVideos(token);
+
+      console.log('User data:', user);
+      console.log('Videos data:', videos);
 
       if (user) setUserProfile(user);
       if (videos) setUserVideos(videos);
@@ -84,21 +93,31 @@ const Dashboard: React.FC = () => {
 
     if (code) {
       // Handle OAuth Callback
-      console.log('TikTok Code detected, exchanging for token...');
+      console.log('🔄 TikTok Code detected, exchanging for token...');
       exchangeCodeForToken(code)
         .then(data => {
+          console.log('✅ Token exchange response:', data);
           if (data.access_token) {
+            console.log('✅ Access token received, saving to localStorage');
             localStorage.setItem('tiktok_access_token', data.access_token);
             localStorage.setItem('tiktok_refresh_token', data.refresh_token);
             // Remove code from URL for cleaner UI
             window.history.replaceState({}, document.title, window.location.pathname);
             loadData(data.access_token);
+          } else {
+            console.error('❌ No access_token in response:', data);
           }
         })
-        .catch(err => console.error('OAuth Error:', err));
+        .catch(err => {
+          console.error('❌ OAuth Error:', err);
+          console.error('Error details:', JSON.stringify(err, null, 2));
+        });
     } else if (savedToken) {
       // Load saved data
+      console.log('📦 Loading data from saved token');
       loadData(savedToken);
+    } else {
+      console.log('ℹ️ No TikTok code or saved token found');
     }
   }, [searchParams]);
 

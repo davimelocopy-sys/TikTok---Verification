@@ -40,14 +40,19 @@ export const handler: Handler = async (event) => {
 
         const data = await response.json();
 
+        console.log('=== TIKTOK API RESPONSE ===');
+        console.log('Status:', response.status);
+        console.log('Data:', JSON.stringify(data, null, 2));
+
         if (data.error) {
-            console.error('TikTok API Error:', data);
+            console.error('❌ TikTok API Error:', data);
             return {
                 statusCode: 400,
                 body: JSON.stringify({ error: data.error, message: data.error_description })
             };
         }
 
+        console.log('✅ Token exchange successful');
         return {
             statusCode: 200,
             body: JSON.stringify(data),
