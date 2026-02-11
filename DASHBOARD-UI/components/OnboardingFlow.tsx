@@ -20,7 +20,7 @@ const OnboardingFlow: React.FC = () => {
     setIsConnecting(true);
 
     // Real TikTok OAuth Flow
-    const CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
+    const CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY || 'aw2hy5cc9vf27xpz';
     // Redirect explicitly to dashboard where we handle the code
     const REDIRECT_URI = window.location.hostname === 'localhost'
       ? 'http://localhost:5173/dashboard'

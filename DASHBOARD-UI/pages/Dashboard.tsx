@@ -67,7 +67,9 @@ const Dashboard: React.FC = () => {
   const [userVideos, setUserVideos] = useState<any[]>([]);
 
   useEffect(() => {
-    const code = searchParams.get('code');
+    // With HashRouter, the search params might be before the #
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = searchParams.get('code') || urlParams.get('code');
     const savedToken = localStorage.getItem('tiktok_access_token');
 
     const loadData = async (token: string) => {
@@ -122,7 +124,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleConnectTikTok = async () => {
-    const CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
+    const CLIENT_KEY = import.meta.env.VITE_TIKTOK_CLIENT_KEY || 'aw2hy5cc9vf27xpz';
     const REDIRECT_URI = window.location.hostname === 'localhost'
       ? 'http://localhost:5173/dashboard'
       : `${window.location.origin}/dashboard`;
