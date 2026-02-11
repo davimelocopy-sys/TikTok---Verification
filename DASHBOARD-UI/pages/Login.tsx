@@ -13,7 +13,10 @@ const Login: React.FC = () => {
                 options: {
                     redirectTo: window.location.hostname === 'localhost'
                         ? 'http://localhost:5173/dashboard'
-                        : 'https://diretrizestiktok.netlify.app/dashboard'
+                        : 'https://diretrizestiktok.netlify.app/dashboard',
+                    queryParams: {
+                        prompt: 'select_account'  // Force account selection on every login
+                    }
                 }
             });
             if (error) throw error;
