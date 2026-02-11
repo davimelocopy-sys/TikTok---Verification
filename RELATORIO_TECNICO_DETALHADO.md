@@ -48,11 +48,38 @@ O Portal do Desenvolvedor do TikTok demonstrou ser extremamente rigoroso com o f
 2.  **Lógica de Callback:** Alteração do `useEffect` para capturar o `code` do TikTok mesmo em URLs híbridas (Hash + Query Params).
 3.  **Netlify Functions:** Criação da função backend em TypeScript para realizar a troca do `code` pelo `token` escondendo o `Client Secret` do navegador.
 
-## 5. Status Atual e Verificação
-- **Build Local:** Validado com `npm run build` com sucesso.
-- **Deploy:** Realizado após autorização na última etapa.
-- **Login:** Em processo de propagação pela Netlify.
-- **Domínio:** Verificado com sucesso no portal do TikTok.
+## 6. Jornada de Depuração: Login e Sandbox (Fase Crítica)
+
+Esta seção detalha a "guerra de atrito" contra o Portal do TikTok para liberar o login e permitir a gravação do vídeo de demonstração.
+
+### I. O Problema do "Client Key" Invisível
+Mesmo com as chaves corretas no código, o erro persistia. 
+- **Descoberta:** O TikTok Developers possui um "delay" de propagação e exige campos obrigatórios (Termos de Serviço, Vídeo de Demo) para ativar a Redirect URI em produção.
+- **Solução:** Migramos a operação para o **Modo Sandbox**.
+
+### II. O desafio do Portal TikTok (UX de Desenvolvedor)
+- **Tentativa e Erro:** Foram necessárias 4 tentativas para localizar o campo "Redirect URI", que fica escondido dentro do produto "Kit de Login" -> aba "Web". 
+- **Erro Chave:** O Portal não salvava as informações se o usuário mudasse de aba antes de clicar em "Salvar/Aplicar Alterações" no topo.
+- **Acerto:** Consolidamos todos os dados (Descrições e URLs) e realizamos um "Salvar Único" para liberar os produtos.
+
+### III. Diagnóstico "Zero PKCE" e Simplificação
+Para isolar se o erro era de lógica (PKCE/Scopes) ou de credenciais:
+- **Ação Radical:** Criamos um fluxo de login simplificado, removendo temporariamente o PKCE e reduzindo os escopos para `user.info.basic`.
+- **Acerto Técnico:** Hardcoding temporário da chave de Sandbox no código e na Netlify Function (`sbaws...`). Isso eliminou a variável de "confusão de ambiente" causada pela Netlify.
+
+### IV. Correção de Logout e Sessão
+- **Falha Identificada:** O botão "Sair" deslogava o Google (Supabase), mas mantinha os tokens do TikTok no `localStorage`.
+- **Correção:** Implementamos um **Logout Global** que limpa `access_token`, `refresh_token`, `verifier` e `state`, garantindo que testes com novas contas comecem do zero.
+
+### V. Erro de Build na Netlify (TSC Error)
+- **Dificuldade:** Durante as iterações rápidas, a função `getEnv` ficou órfã no código da Netlify Function.
+- **Erro:** Erro `TS6133: 'getEnv' is declared but its value is never read`. O deploy foi bloqueado.
+- **Correção:** Limpeza do código morto e validação via `npm run build` local antes do push final.
+
+## 7. Conclusões e Estado Final
+- **Chaves Atuais:** O sistema está operando com chaves de **Sandbox** hardcoded para máxima estabilidade durante a gravação.
+- **Fluxo de Login:** 100% funcional, incluindo o retorno dos dados de perfil do usuário.
+- **Próximo Passo:** Gravação do vídeo de demonstração iniciando pela página de Login para garantir a aprovação do TikTok.
 
 ---
 **Observação:** Este documento serve como o Registro de Verdade (Source of Truth) para o estado técnico da integração até o presente momento.
