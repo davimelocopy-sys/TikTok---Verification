@@ -1,13 +1,9 @@
 
 const TIKTOK_API_BASE = 'https://open.tiktokapis.com/v2';
 
-// Final robust logic: Env variable first, Sandbox key as fallback
+// FORCING SANDBOX KEY FOR VIDEO RECORDING - NO FALLBACKS
 export const getTikTokClientKey = () => {
-    const rawKey = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
-    if (!rawKey || rawKey === 'undefined' || rawKey === 'null') {
-        return 'sbawsesnguzr1tmzg2'; // Working Sandbox Key
-    }
-    return rawKey;
+    return 'sbawsesnguzr1tmzg2';
 };
 
 // Consistent Redirect URI

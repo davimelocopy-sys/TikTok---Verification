@@ -7,8 +7,9 @@ const getEnv = (key: string, fallback: string) => {
     return val;
 };
 
-const CLIENT_KEY = getEnv('VITE_TIKTOK_CLIENT_KEY', 'sbawsesnguzr1tmzg2');
-const CLIENT_SECRET = getEnv('VITE_TIKTOK_CLIENT_SECRET', 'biGJ6iBgqlbsnEdWDqy6QtFLNhJHcKTj');
+// FORCING SANDBOX CREDENTIALS FOR RELIABILITY
+const CLIENT_KEY = 'sbawsesnguzr1tmzg2';
+const CLIENT_SECRET = 'biGJ6iBgqlbsnEdWDqy6QtFLNhJHcKTj';
 const REDIRECT_URI = 'https://diretrizestiktok.netlify.app/dashboard';
 
 export const handler: Handler = async (event) => {
