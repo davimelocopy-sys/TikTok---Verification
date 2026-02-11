@@ -92,26 +92,29 @@ export const generateCodeChallenge = async (verifier: string) => {
 };
 
 /**
- * Generates the full Auth URL (Simplified without PKCE for testing)
+ * Generates the full Auth URL with PKCE for the demonstration video
  */
 export const getTikTokAuthUrl = async () => {
     const CLIENT_KEY = getTikTokClientKey();
     const REDIRECT_URI = getTikTokRedirectUri();
 
-    // REDUCED SCOPES for testing - only the basics
-    const SCOPE = 'user.info.basic';
-    const STATE = 'tiktok_debug_' + Math.random().toString(36).substring(7);
+    // FULL SCOPES for the demo video
+    const SCOPE = 'user.info.basic,video.list,video.data';
+    const STATE = 'tiktok_val_' + Math.random().toString(36).substring(7);
+
+    // PKCE implementation
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = await generateCodeChallenge(codeVerifier);
 
     // Persist for callback
     localStorage.setItem('tiktok_oauth_state', STATE);
+    localStorage.setItem('tiktok_code_verifier', codeVerifier);
 
-    const url = `https://www.tiktok.com/v2/auth/authorize/?client_key=${CLIENT_KEY}&scope=${SCOPE}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE}`;
+    const url = `https://www.tiktok.com/v2/auth/authorize/?client_key=${CLIENT_KEY}&scope=${SCOPE}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
 
-    console.log('--- TIKTOK DEBUG ---');
-    console.log('Client Key used:', CLIENT_KEY);
-    console.log('Redirect URI used:', REDIRECT_URI);
-    console.log('Scopes used:', SCOPE);
-    console.log('Auth URL:', url);
+    console.log('--- TIKTOK DEMO MODE ---');
+    console.log('Client Key:', CLIENT_KEY);
+    console.log('Redirect URI:', REDIRECT_URI);
 
     return url;
 };
