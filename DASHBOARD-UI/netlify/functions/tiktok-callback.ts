@@ -3,7 +3,7 @@ import { Handler } from '@netlify/functions';
 const CLIENT_KEY = process.env.VITE_TIKTOK_CLIENT_KEY;
 const CLIENT_SECRET = process.env.VITE_TIKTOK_CLIENT_SECRET;
 const REDIRECT_URI = process.env.URL
-    ? `${process.env.URL}/dashboard` // Production (Netlify sets URL)
+    ? 'https://diretrizestiktok.netlify.app/dashboard' // Force Production URL
     : 'http://localhost:5173/dashboard'; // Local development
 
 export const handler: Handler = async (event) => {

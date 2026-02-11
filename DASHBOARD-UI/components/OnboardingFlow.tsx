@@ -24,7 +24,7 @@ const OnboardingFlow: React.FC = () => {
     // Redirect explicitly to dashboard where we handle the code
     const REDIRECT_URI = window.location.hostname === 'localhost'
       ? 'http://localhost:5173/dashboard'
-      : `${window.location.origin}/dashboard`;
+      : 'https://diretrizestiktok.netlify.app/dashboard';
 
     const SCOPE = 'user.info.basic,video.list,video.data';
     const STATE = 'tiktok_connect_' + Math.random().toString(36).substring(7);

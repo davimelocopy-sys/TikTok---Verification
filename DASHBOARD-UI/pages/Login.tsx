@@ -11,7 +11,9 @@ const Login: React.FC = () => {
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin
+                    redirectTo: window.location.hostname === 'localhost'
+                        ? 'http://localhost:5173/dashboard'
+                        : 'https://diretrizestiktok.netlify.app/dashboard'
                 }
             });
             if (error) throw error;
