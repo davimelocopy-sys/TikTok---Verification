@@ -1,11 +1,5 @@
 import { Handler } from '@netlify/functions';
 
-// Robust fallbacks for environment variables
-const getEnv = (key: string, fallback: string) => {
-    const val = process.env[key];
-    if (!val || val === 'undefined' || val === 'null') return fallback;
-    return val;
-};
 
 // FORCING SANDBOX CREDENTIALS FOR RELIABILITY
 const CLIENT_KEY = 'sbawsesnguzr1tmzg2';
