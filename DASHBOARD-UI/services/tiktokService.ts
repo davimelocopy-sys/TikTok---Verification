@@ -1,13 +1,9 @@
 
 const TIKTOK_API_BASE = 'https://open.tiktokapis.com/v2';
 
-// Robust Client Key with fallback for Sandbox/Production
+// FORCING SANDBOX KEY FOR DEFINITIVE DEBUG
 export const getTikTokClientKey = () => {
-    const rawKey = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
-    if (!rawKey || rawKey === 'undefined' || rawKey === 'null') {
-        return 'sbawsesnguzr1tmzg2'; // New Sandbox Client Key
-    }
-    return rawKey;
+    return 'sbawsesnguzr1tmzg2';
 };
 
 // Consistent Redirect URI
@@ -96,20 +92,26 @@ export const generateCodeChallenge = async (verifier: string) => {
 };
 
 /**
- * Generates the full Auth URL with PKCE
+ * Generates the full Auth URL (Simplified without PKCE for testing)
  */
 export const getTikTokAuthUrl = async () => {
     const CLIENT_KEY = getTikTokClientKey();
     const REDIRECT_URI = getTikTokRedirectUri();
-    const SCOPE = 'user.info.basic,video.list,video.data';
-    const STATE = 'tiktok_connect_' + Math.random().toString(36).substring(7);
 
-    const codeVerifier = generateCodeVerifier();
-    const codeChallenge = await generateCodeChallenge(codeVerifier);
+    // REDUCED SCOPES for testing - only the basics
+    const SCOPE = 'user.info.basic';
+    const STATE = 'tiktok_debug_' + Math.random().toString(36).substring(7);
 
     // Persist for callback
     localStorage.setItem('tiktok_oauth_state', STATE);
-    localStorage.setItem('tiktok_code_verifier', codeVerifier);
 
-    return `https://www.tiktok.com/v2/auth/authorize/?client_key=${CLIENT_KEY}&scope=${SCOPE}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE}&code_challenge=${codeChallenge}&code_challenge_method=S256`;
+    const url = `https://www.tiktok.com/v2/auth/authorize/?client_key=${CLIENT_KEY}&scope=${SCOPE}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${STATE}`;
+
+    console.log('--- TIKTOK DEBUG ---');
+    console.log('Client Key used:', CLIENT_KEY);
+    console.log('Redirect URI used:', REDIRECT_URI);
+    console.log('Scopes used:', SCOPE);
+    console.log('Auth URL:', url);
+
+    return url;
 };
