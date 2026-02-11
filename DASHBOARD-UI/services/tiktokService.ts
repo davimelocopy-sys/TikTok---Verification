@@ -1,11 +1,11 @@
 
 const TIKTOK_API_BASE = 'https://open.tiktokapis.com/v2';
 
-// Robust Client Key with fallback for string "undefined"
+// Robust Client Key with fallback for Sandbox/Production
 export const getTikTokClientKey = () => {
     const rawKey = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
     if (!rawKey || rawKey === 'undefined' || rawKey === 'null') {
-        return 'aw2hy5cc9vf27xpz'; // Verified fallback from CREDENCIAIS.md
+        return 'sbawsesnguzr1tmzg2'; // New Sandbox Client Key
     }
     return rawKey;
 };
