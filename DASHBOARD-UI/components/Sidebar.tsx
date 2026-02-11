@@ -3,8 +3,38 @@ import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, CheckSquare, Trophy, ShoppingBag, Settings, LogOut, Shield } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
-const Sidebar: React.FC<{ user: any }> = ({ user }) => {
+interface SidebarProps {
+  user: any;
+  tiktokUser?: any; // Adicionado suporte a dados do TikTok
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ user }) => {
   const location = useLocation();
+  const [tiktokUser, setTiktokUser] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    // 1. Initial load from storage
+    const loadTikTokUser = () => {
+      const stored = localStorage.getItem('tiktok_user_info');
+      if (stored) {
+        setTiktokUser(JSON.parse(stored));
+      } else {
+        setTiktokUser(null);
+      }
+    };
+
+    loadTikTokUser();
+
+    // 2. Listen for custom event from Dashboard
+    const handleLoginEvent = () => loadTikTokUser();
+    window.addEventListener('tiktok_login', handleLoginEvent);
+    window.addEventListener('storage', handleLoginEvent); // Cross-tab sync
+
+    return () => {
+      window.removeEventListener('tiktok_login', handleLoginEvent);
+      window.removeEventListener('storage', handleLoginEvent);
+    };
+  }, []);
 
   const handleSignOut = async () => {
     // Clear Supabase session
@@ -15,6 +45,8 @@ const Sidebar: React.FC<{ user: any }> = ({ user }) => {
     localStorage.removeItem('tiktok_refresh_token');
     localStorage.removeItem('tiktok_oauth_state');
     localStorage.removeItem('tiktok_code_verifier');
+    localStorage.removeItem('tiktok_user_info'); // Clear user info too
+    setTiktokUser(null);
 
     // Redirect to login page
     window.location.href = '/';
@@ -58,13 +90,17 @@ const Sidebar: React.FC<{ user: any }> = ({ user }) => {
       <div className="p-4 border-t border-slate-100">
         <div className="flex items-center gap-3 mb-4">
           <img
-            src={user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user?.user_metadata?.full_name || 'User'}`}
+            src={tiktokUser?.avatar_url || user?.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${tiktokUser?.display_name || user?.user_metadata?.full_name || 'User'}`}
             alt="User"
             className="w-9 h-9 rounded-full object-cover border border-slate-200"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-900 truncate">{user?.user_metadata?.full_name || 'Usuário'}</p>
-            <p className="text-xs text-slate-500 capitalize">Plano Pro</p>
+            <p className="text-sm font-medium text-slate-900 truncate">
+              {tiktokUser?.display_name || user?.user_metadata?.full_name || 'Usuário'}
+            </p>
+            <p className="text-xs text-slate-500 capitalize">
+              {tiktokUser ? 'TikTok Connected' : 'Plano Pro'}
+            </p>
           </div>
         </div>
         <button

@@ -86,7 +86,12 @@ const Dashboard: React.FC = () => {
       console.log('User data:', user);
       console.log('Videos data:', videos);
 
-      if (user) setUserProfile(user);
+      if (user) {
+        setUserProfile(user);
+        localStorage.setItem('tiktok_user_info', JSON.stringify(user));
+        // Dispatch event to update Sidebar
+        window.dispatchEvent(new Event('tiktok_login'));
+      }
       if (videos) setUserVideos(videos);
       setIsLoading(false);
     };
