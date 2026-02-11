@@ -1,9 +1,13 @@
 
 const TIKTOK_API_BASE = 'https://open.tiktokapis.com/v2';
 
-// FORCING SANDBOX KEY FOR DEFINITIVE DEBUG
+// Final robust logic: Env variable first, Sandbox key as fallback
 export const getTikTokClientKey = () => {
-    return 'sbawsesnguzr1tmzg2';
+    const rawKey = import.meta.env.VITE_TIKTOK_CLIENT_KEY;
+    if (!rawKey || rawKey === 'undefined' || rawKey === 'null') {
+        return 'sbawsesnguzr1tmzg2'; // Working Sandbox Key
+    }
+    return rawKey;
 };
 
 // Consistent Redirect URI
